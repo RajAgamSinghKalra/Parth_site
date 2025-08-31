@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  // Dev uses SQLite file; set DATABASE_URL="file:./dev.db"
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum MaterialType {
+  NOTES
+  SYLLABUS
+  GUIDE
+  ASSIGNMENT
+  PPT
+  OTHER
+}
+
+model College {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  location  String?
+  logoUrl   String?
+  courses   Course[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Course {
+  id        String   @id @default(cuid())
+  college   College  @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+  collegeId String
+  name      String
+  slug      String
+  subjects  Subject[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([collegeId, slug])
+}
+
+model Subject {
+  id        String   @id @default(cuid())
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId  String
+  name      String
+  code      String?
+  semester  Int?
+  slug      String
+  materials Material[]
+  pyqs      PYQ[]
+  videos    Video[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([courseId, slug])
+}
+
+model Material {
+  id          String       @id @default(cuid())
+  subject     Subject      @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  subjectId   String
+  type        MaterialType
+  title       String
+  description String?
+  fileUrl     String?
+  externalUrl String?
+  tags        String[]
+  year        Int?
+  author      String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model PYQ {
+  id           String   @id @default(cuid())
+  subject      Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  subjectId    String
+  year         Int
+  examType     String
+  fileUrl      String
+  solutionsUrl String?
+  tags         String[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Video {
+  id          String   @id @default(cuid())
+  subject     Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  subjectId   String
+  youtubeId   String
+  title       String
+  description String?
+  tags        String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  role         String   @default("admin")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
