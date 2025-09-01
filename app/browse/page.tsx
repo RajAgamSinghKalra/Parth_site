@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { unstable_noStore as noStore } from "next/cache"
 import { cn } from "@/lib/utils"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { prisma } from "@/lib/prisma"
@@ -15,6 +16,7 @@ const tabs = [
 ] as const
 
 export default function BrowsePage({ searchParams }: { searchParams: SearchParams }) {
+  noStore()
   const active = (searchParams.by || "college") as SearchParams["by"]
 
   return (
@@ -50,6 +52,7 @@ export default function BrowsePage({ searchParams }: { searchParams: SearchParam
 }
 
 async function CollegeGrid() {
+  noStore()
   const colleges = await prisma.college.findMany({ orderBy: { name: "asc" } })
   return (
     <section aria-labelledby="colleges" className="space-y-3">
@@ -79,6 +82,7 @@ async function CollegeGrid() {
 }
 
 async function CourseGrid() {
+  noStore()
   const courses = await prisma.course.findMany({ orderBy: { name: "asc" } })
   return (
     <section aria-labelledby="courses" className="space-y-3">
@@ -108,6 +112,7 @@ async function CourseGrid() {
 }
 
 async function SubjectGrid() {
+  noStore()
   const subjects = await prisma.subject.findMany({ orderBy: { name: "asc" } })
   return (
     <section aria-labelledby="subjects" className="space-y-3">

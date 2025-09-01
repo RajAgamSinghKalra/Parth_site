@@ -1,6 +1,7 @@
 import { FileText, HelpCircle, PlayCircle } from "lucide-react"
 import Link from "next/link" // use internal viewers
 import { notFound } from "next/navigation"
+import { unstable_noStore as noStore } from "next/cache"
 import { PageTracker } from "@/components/tracking/page-tracker"
 import { prisma } from "@/lib/prisma"
 
@@ -8,6 +9,7 @@ export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
 export default async function SubjectPage({ params }: { params: { slug: string } }) {
+  noStore()
   const subject = await prisma.subject.findFirst({
     where: { slug: params.slug },
     include: { materials: true, pyqs: true, videos: true },
