@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
-import useSWR from "swr"
+import useLiveQuery from "@/hooks/use-live-query"
 import { cn } from "@/lib/utils"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -13,8 +13,6 @@ const tabs = [
   { key: "course", label: "By Course", href: "/browse?by=course" },
   { key: "subject", label: "By Subject", href: "/browse?by=subject" },
 ] as const
-
-const fetcher = (u: string) => fetch(u).then((r) => r.json())
 
 export default function BrowsePage() {
   const searchParams = useSearchParams()
@@ -57,12 +55,13 @@ type Course = { id: string; name: string; slug: string }
 type Subject = { id: string; name: string; slug: string }
 
 function CollegeGrid() {
-  const { data } = useSWR<{ items: College[] }>(
+  const { data, error } = useLiveQuery<{ items: College[] }>(
     "/api/colleges?page=1&pageSize=1000",
-    fetcher,
-    { refreshInterval: 10000 },
+    10000,
   )
-  const colleges = data?.items || []
+  if (error) return <p className="text-sm text-muted-foreground">Failed to load colleges.</p>
+  if (!data) return <p className="text-sm text-muted-foreground">Loading...</p>
+  const colleges = data.items
   return (
     <section aria-labelledby="colleges" className="space-y-3">
       <h2 id="colleges" className="font-serif text-xl font-semibold">
@@ -91,12 +90,13 @@ function CollegeGrid() {
 }
 
 function CourseGrid() {
-  const { data } = useSWR<{ items: Course[] }>(
+  const { data, error } = useLiveQuery<{ items: Course[] }>(
     "/api/courses?page=1&pageSize=1000",
-    fetcher,
-    { refreshInterval: 10000 },
+    10000,
   )
-  const courses = data?.items || []
+  if (error) return <p className="text-sm text-muted-foreground">Failed to load courses.</p>
+  if (!data) return <p className="text-sm text-muted-foreground">Loading...</p>
+  const courses = data.items
   return (
     <section aria-labelledby="courses" className="space-y-3">
       <h2 id="courses" className="font-serif text-xl font-semibold">
@@ -125,12 +125,13 @@ function CourseGrid() {
 }
 
 function SubjectGrid() {
-  const { data } = useSWR<{ items: Subject[] }>(
+  const { data, error } = useLiveQuery<{ items: Subject[] }>(
     "/api/subjects?page=1&pageSize=1000",
-    fetcher,
-    { refreshInterval: 10000 },
+    10000,
   )
-  const subjects = data?.items || []
+  if (error) return <p className="text-sm text-muted-foreground">Failed to load subjects.</p>
+  if (!data) return <p className="text-sm text-muted-foreground">Loading...</p>
+  const subjects = data.items
   return (
     <section aria-labelledby="subjects" className="space-y-3">
       <h2 id="subjects" className="font-serif text-xl font-semibold">
