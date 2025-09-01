@@ -1,16 +1,26 @@
 import Link from "next/link"
+import { notFound } from "next/navigation"
 import { PageTracker } from "@/components/tracking/page-tracker"
+import { prisma } from "@/lib/prisma"
 
-export default function CollegePage({ params }: { params: { slug: string } }) {
+export const dynamic = "force-dynamic"
+
+export default async function CollegePage({ params }: { params: { slug: string } }) {
   const { slug } = params
-  const name = slugToTitle(slug)
+  const college = await prisma.college.findUnique({
+    where: { slug },
+    include: { courses: { orderBy: { name: "asc" } } },
+  })
+  if (!college) return notFound()
 
   return (
     <div className="space-y-6">
-      <PageTracker title={name} href={`/college/${slug}`} type="nav" />
+      <PageTracker title={college.name} href={`/college/${college.slug}`} type="nav" />
       <header className="space-y-1">
-        <h1 className="font-serif text-2xl font-semibold">{name}</h1>
-        <p className="text-sm text-muted-foreground">Browse courses and subjects from {name}.</p>
+        <h1 className="font-serif text-2xl font-semibold">{college.name}</h1>
+        <p className="text-sm text-muted-foreground">
+          Browse courses and subjects from {college.name}.
+        </p>
       </header>
 
       <section aria-labelledby="courses" className="space-y-2">
@@ -18,13 +28,13 @@ export default function CollegePage({ params }: { params: { slug: string } }) {
           Courses
         </h2>
         <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {["btech-cse", "bsc-physics", "mba-core"].map((c) => (
-            <li key={c}>
+          {college.courses.map((c) => (
+            <li key={c.id}>
               <Link
-                href={`/course/${c}`}
+                href={`/course/${c.slug}`}
                 className="block rounded-lg border border-border bg-card px-3 py-2 hover:bg-muted"
               >
-                {slugToTitle(c)}
+                {c.name}
               </Link>
             </li>
           ))}
@@ -32,8 +42,4 @@ export default function CollegePage({ params }: { params: { slug: string } }) {
       </section>
     </div>
   )
-}
-
-function slugToTitle(s: string) {
-  return s.replace(/-/g, " ").replace(/\b\w/g, (m) => m.toUpperCase())
 }

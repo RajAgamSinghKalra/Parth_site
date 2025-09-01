@@ -1,6 +1,9 @@
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { prisma } from "@/lib/prisma"
+
+export const dynamic = "force-dynamic"
 
 type SearchParams = { by?: "college" | "course" | "subject" }
 
@@ -45,19 +48,16 @@ export default function BrowsePage({ searchParams }: { searchParams: SearchParam
   )
 }
 
-function CollegeGrid() {
-  const demo = [
-    { slug: "mlu", name: "Modern Learning University" },
-    { slug: "nit", name: "National Institute of Tech" },
-  ]
+async function CollegeGrid() {
+  const colleges = await prisma.college.findMany({ orderBy: { name: "asc" } })
   return (
     <section aria-labelledby="colleges" className="space-y-3">
       <h2 id="colleges" className="font-serif text-xl font-semibold">
         Colleges
       </h2>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {demo.map((c) => (
-          <Link key={c.slug} href={`/college/${c.slug}`} className="group">
+        {colleges.map((c) => (
+          <Link key={c.id} href={`/college/${c.slug}`} className="group">
             <Card className="transition-colors group-hover:border-foreground/20">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">{c.name}</CardTitle>
@@ -73,20 +73,16 @@ function CollegeGrid() {
   )
 }
 
-function CourseGrid() {
-  const demo = [
-    { slug: "btech-cs", name: "B.Tech Computer Science" },
-    { slug: "btech-me", name: "B.Tech Mechanical" },
-    { slug: "btech-cs-nit", name: "B.Tech Computer Science (NIT)" },
-  ]
+async function CourseGrid() {
+  const courses = await prisma.course.findMany({ orderBy: { name: "asc" } })
   return (
     <section aria-labelledby="courses" className="space-y-3">
       <h2 id="courses" className="font-serif text-xl font-semibold">
         Courses
       </h2>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {demo.map((c) => (
-          <Link key={c.slug} href={`/course/${c.slug}`} className="group">
+        {courses.map((c) => (
+          <Link key={c.id} href={`/course/${c.slug}`} className="group">
             <Card className="transition-colors group-hover:border-foreground/20">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">{c.name}</CardTitle>
@@ -102,20 +98,16 @@ function CourseGrid() {
   )
 }
 
-function SubjectGrid() {
-  const demo = [
-    { slug: "dsa", name: "Data Structures & Algorithms" },
-    { slug: "dbms", name: "DBMS" },
-    { slug: "thermodynamics", name: "Thermodynamics" },
-  ]
+async function SubjectGrid() {
+  const subjects = await prisma.subject.findMany({ orderBy: { name: "asc" } })
   return (
     <section aria-labelledby="subjects" className="space-y-3">
       <h2 id="subjects" className="font-serif text-xl font-semibold">
         Subjects
       </h2>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {demo.map((s) => (
-          <Link key={s.slug} href={`/subject/${s.slug}`} className="group">
+        {subjects.map((s) => (
+          <Link key={s.id} href={`/subject/${s.slug}`} className="group">
             <Card className="transition-colors group-hover:border-foreground/20">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">{s.name}</CardTitle>
