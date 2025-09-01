@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { prisma } from "@/lib/prisma"
 
+export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
 type SearchParams = { by?: "college" | "course" | "subject" }
@@ -55,20 +56,24 @@ async function CollegeGrid() {
       <h2 id="colleges" className="font-serif text-xl font-semibold">
         Colleges
       </h2>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {colleges.map((c) => (
-          <Link key={c.id} href={`/college/${c.slug}`} className="group">
-            <Card className="transition-colors group-hover:border-foreground/20">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base">{c.name}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">Explore courses and subjects</p>
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
-      </div>
+      {colleges.length > 0 ? (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {colleges.map((c) => (
+            <Link key={c.id} href={`/college/${c.slug}`} className="group">
+              <Card className="transition-colors group-hover:border-foreground/20">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">{c.name}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">Explore courses and subjects</p>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <p className="text-sm text-muted-foreground">No colleges found.</p>
+      )}
     </section>
   )
 }
@@ -80,20 +85,24 @@ async function CourseGrid() {
       <h2 id="courses" className="font-serif text-xl font-semibold">
         Courses
       </h2>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {courses.map((c) => (
-          <Link key={c.id} href={`/course/${c.slug}`} className="group">
-            <Card className="transition-colors group-hover:border-foreground/20">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base">{c.name}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">Browse subjects and materials</p>
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
-      </div>
+      {courses.length > 0 ? (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {courses.map((c) => (
+            <Link key={c.id} href={`/course/${c.slug}`} className="group">
+              <Card className="transition-colors group-hover:border-foreground/20">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">{c.name}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">Browse subjects and materials</p>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <p className="text-sm text-muted-foreground">No courses found.</p>
+      )}
     </section>
   )
 }
@@ -105,20 +114,24 @@ async function SubjectGrid() {
       <h2 id="subjects" className="font-serif text-xl font-semibold">
         Subjects
       </h2>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {subjects.map((s) => (
-          <Link key={s.id} href={`/subject/${s.slug}`} className="group">
-            <Card className="transition-colors group-hover:border-foreground/20">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base">{s.name}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">Notes, PYQs, and videos</p>
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
-      </div>
+      {subjects.length > 0 ? (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {subjects.map((s) => (
+            <Link key={s.id} href={`/subject/${s.slug}`} className="group">
+              <Card className="transition-colors group-hover:border-foreground/20">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">{s.name}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">Notes, PYQs, and videos</p>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <p className="text-sm text-muted-foreground">No subjects found.</p>
+      )}
     </section>
   )
 }

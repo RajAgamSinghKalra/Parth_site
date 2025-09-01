@@ -4,6 +4,7 @@ import { notFound } from "next/navigation"
 import { PageTracker } from "@/components/tracking/page-tracker"
 import { prisma } from "@/lib/prisma"
 
+export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
 export default async function SubjectPage({ params }: { params: { slug: string } }) {
@@ -29,99 +30,81 @@ export default async function SubjectPage({ params }: { params: { slug: string }
         <h2 id="materials" className="font-serif text-xl font-semibold">
           Materials
         </h2>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {notes.length > 0
-            ? notes.map((n) => (
-                <Link
-                  key={n.id}
-                  href={`/view/note?title=${encodeURIComponent(n.title)}&url=${encodeURIComponent(
-                    n.fileUrl || n.externalUrl || "",
-                  )}`}
-                  className="rounded-xl border border-border bg-card p-4 transition-colors hover:border-foreground/30"
-                >
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4" aria-hidden="true" />
-                    <span className="text-sm font-medium">{n.title}</span>
-                  </div>
-                  <p className="mt-2 text-sm text-muted-foreground">{n.type} • Opens inside site</p>
-                </Link>
-              ))
-            : [1, 2, 3].map((i) => (
-                <article key={i} className="rounded-xl border border-border bg-card p-4 opacity-60">
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4" aria-hidden="true" />
-                    <span className="text-sm font-medium">Material {i}</span>
-                  </div>
-                  <p className="mt-2 text-sm text-muted-foreground">Placeholder</p>
-                </article>
-              ))}
-        </div>
+        {notes.length > 0 ? (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {notes.map((n) => (
+              <Link
+                key={n.id}
+                href={`/view/note?title=${encodeURIComponent(n.title)}&url=${encodeURIComponent(
+                  n.fileUrl || n.externalUrl || "",
+                )}`}
+                className="rounded-xl border border-border bg-card p-4 transition-colors hover:border-foreground/30"
+              >
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" aria-hidden="true" />
+                  <span className="text-sm font-medium">{n.title}</span>
+                </div>
+                <p className="mt-2 text-sm text-muted-foreground">{n.type} • Opens inside site</p>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground">No materials found.</p>
+        )}
       </section>
 
       <section aria-labelledby="pyqs" className="space-y-3">
         <h2 id="pyqs" className="font-serif text-xl font-semibold">
           PYQs
         </h2>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {pyqs.length > 0
-            ? pyqs.map((q) => (
-                <a
-                  key={q.id}
-                  href={q.fileUrl}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className="rounded-xl border border-border bg-card p-4 transition-colors hover:border-foreground/30"
-                >
-                  <div className="flex items-center gap-2">
-                    <HelpCircle className="h-4 w-4" aria-hidden="true" />
-                    <span className="text-sm font-medium">{q.examType} {q.year}</span>
-                  </div>
-                  <p className="mt-2 text-sm text-muted-foreground">PDF • Opens in new tab</p>
-                </a>
-              ))
-            : [1, 2, 3].map((i) => (
-                <article key={i} className="rounded-xl border border-border bg-card p-4 opacity-60">
-                  <div className="flex items-center gap-2">
-                    <HelpCircle className="h-4 w-4" aria-hidden="true" />
-                    <span className="text-sm font-medium">PYQ {i}</span>
-                  </div>
-                  <p className="mt-2 text-sm text-muted-foreground">Placeholder</p>
-                </article>
-              ))}
-        </div>
+        {pyqs.length > 0 ? (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {pyqs.map((q) => (
+              <a
+                key={q.id}
+                href={q.fileUrl}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="rounded-xl border border-border bg-card p-4 transition-colors hover:border-foreground/30"
+              >
+                <div className="flex items-center gap-2">
+                  <HelpCircle className="h-4 w-4" aria-hidden="true" />
+                  <span className="text-sm font-medium">{q.examType} {q.year}</span>
+                </div>
+                <p className="mt-2 text-sm text-muted-foreground">PDF • Opens in new tab</p>
+              </a>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground">No PYQs found.</p>
+        )}
       </section>
 
       <section aria-labelledby="videos" className="space-y-3">
         <h2 id="videos" className="font-serif text-xl font-semibold">
           Videos
         </h2>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {videos.length > 0
-            ? videos.map((v) => (
-                <Link
-                  key={v.id}
-                  href={`/view/video?v=${encodeURIComponent(
-                    `https://www.youtube.com/watch?v=${v.youtubeId}`,
-                  )}&title=${encodeURIComponent(v.title)}`}
-                  className="rounded-xl border border-border bg-card p-4 transition-colors hover:border-foreground/30"
-                >
-                  <div className="flex items-center gap-2">
-                    <PlayCircle className="h-4 w-4" aria-hidden="true" />
-                    <span className="text-sm font-medium">{v.title}</span>
-                  </div>
-                  <p className="mt-2 text-sm text-muted-foreground">YouTube • Opens inside site</p>
-                </Link>
-              ))
-            : [1, 2, 3].map((i) => (
-                <article key={i} className="rounded-xl border border-border bg-card p-4 opacity-60">
-                  <div className="flex items-center gap-2">
-                    <PlayCircle className="h-4 w-4" aria-hidden="true" />
-                    <span className="text-sm font-medium">Video {i}</span>
-                  </div>
-                  <p className="mt-2 text-sm text-muted-foreground">Placeholder</p>
-                </article>
-              ))}
-        </div>
+        {videos.length > 0 ? (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {videos.map((v) => (
+              <Link
+                key={v.id}
+                href={`/view/video?v=${encodeURIComponent(
+                  `https://www.youtube.com/watch?v=${v.youtubeId}`,
+                )}&title=${encodeURIComponent(v.title)}`}
+                className="rounded-xl border border-border bg-card p-4 transition-colors hover:border-foreground/30"
+              >
+                <div className="flex items-center gap-2">
+                  <PlayCircle className="h-4 w-4" aria-hidden="true" />
+                  <span className="text-sm font-medium">{v.title}</span>
+                </div>
+                <p className="mt-2 text-sm text-muted-foreground">YouTube • Opens inside site</p>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground">No videos found.</p>
+        )}
       </section>
     </div>
   )
