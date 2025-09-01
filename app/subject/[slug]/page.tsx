@@ -1,30 +1,30 @@
 import { FileText, HelpCircle, PlayCircle } from "lucide-react"
 import Link from "next/link" // use internal viewers
+import { notFound } from "next/navigation"
 import { PageTracker } from "@/components/tracking/page-tracker"
-import { demoSubjects, demoNotes, demoVideos } from "@/lib/demo-data"
+import { prisma } from "@/lib/prisma"
 
-export default function SubjectPage({ params }: { params: { slug: string } }) {
-  const subject = demoSubjects.find((s) => s.slug === params.slug)
-  const title = subject?.name || slugToTitle(params.slug)
-  const notes = demoNotes.filter((n) => n.subjectId === subject?.id)
-  const videos = demoVideos.filter((v) => v.subjectId === subject?.id)
-  const pyqs = [
-    {
-      title: "Previous Year Paper (Sample 1)",
-      url: "https://web.stanford.edu/class/archive/cs/cs106a/cs106a.1212/handouts_midterm/CS106A-Midterm.pdf",
-    },
-    {
-      title: "Previous Year Paper (Sample 2)",
-      url: "https://www.math.toronto.edu/ivan/mat185f10/MAT185F10Midterm.pdf",
-    },
-  ]
+export const runtime = "nodejs"
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
+export default async function SubjectPage({ params }: { params: { slug: string } }) {
+  const subject = await prisma.subject.findFirst({
+    where: { slug: params.slug },
+    include: { materials: true, pyqs: true, videos: true },
+  })
+  if (!subject) return notFound()
+
+  const notes = subject.materials
+  const pyqs = subject.pyqs
+  const videos = subject.videos
 
   return (
     <div className="space-y-6">
-      <PageTracker title={title} href={`/subject/${params.slug}`} type="nav" />
+      <PageTracker title={subject.name} href={`/subject/${subject.slug}`} type="nav" />
       <header className="space-y-1">
-        <h1 className="font-serif text-2xl font-semibold">{title}</h1>
-        <p className="text-sm text-muted-foreground">Notes, PYQs, and videos for {title}.</p>
+        <h1 className="font-serif text-2xl font-semibold">{subject.name}</h1>
+        <p className="text-sm text-muted-foreground">Notes, PYQs, and videos for {subject.name}.</p>
       </header>
 
       <section aria-labelledby="materials" className="space-y-3">
@@ -36,25 +36,25 @@ export default function SubjectPage({ params }: { params: { slug: string } }) {
             ? notes.map((n) => (
                 <Link
                   key={n.id}
-                  href={`/view/note?title=${encodeURIComponent(n.title)}&url=${encodeURIComponent(n.url)}`}
+                  href={`/view/note?title=${encodeURIComponent(n.title)}&url=${encodeURIComponent(
+                    n.fileUrl || n.externalUrl || "",
+                  )}`}
                   className="rounded-xl border border-border bg-card p-4 transition-colors hover:border-foreground/30"
                 >
                   <div className="flex items-center gap-2">
                     <FileText className="h-4 w-4" aria-hidden="true" />
                     <span className="text-sm font-medium">{n.title}</span>
                   </div>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    {n.type === "pdf" ? "PDF" : "Web"} • Opens inside site
-                  </p>
+                  <p className="mt-2 text-sm text-muted-foreground">{n.type} • Opens inside site</p>
                 </Link>
               ))
             : [1, 2, 3].map((i) => (
                 <article key={i} className="rounded-xl border border-border bg-card p-4 opacity-60">
                   <div className="flex items-center gap-2">
                     <FileText className="h-4 w-4" aria-hidden="true" />
-                    <span className="text-sm font-medium">Chapter {i} Notes</span>
+                    <span className="text-sm font-medium">Material {i}</span>
                   </div>
-                  <p className="mt-2 text-sm text-muted-foreground">PDF • Placeholder</p>
+                  <p className="mt-2 text-sm text-muted-foreground">Placeholder</p>
                 </article>
               ))}
         </div>
@@ -65,21 +65,31 @@ export default function SubjectPage({ params }: { params: { slug: string } }) {
           PYQs
         </h2>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {pyqs.map((q) => (
-            <a
-              key={q.title}
-              href={q.url}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="rounded-xl border border-border bg-card p-4 transition-colors hover:border-foreground/30"
-            >
-              <div className="flex items-center gap-2">
-                <HelpCircle className="h-4 w-4" aria-hidden="true" />
-                <span className="text-sm font-medium">{q.title}</span>
-              </div>
-              <p className="mt-2 text-sm text-muted-foreground">PDF • Opens in new tab</p>
-            </a>
-          ))}
+          {pyqs.length > 0
+            ? pyqs.map((q) => (
+                <a
+                  key={q.id}
+                  href={q.fileUrl}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="rounded-xl border border-border bg-card p-4 transition-colors hover:border-foreground/30"
+                >
+                  <div className="flex items-center gap-2">
+                    <HelpCircle className="h-4 w-4" aria-hidden="true" />
+                    <span className="text-sm font-medium">{q.examType} {q.year}</span>
+                  </div>
+                  <p className="mt-2 text-sm text-muted-foreground">PDF • Opens in new tab</p>
+                </a>
+              ))
+            : [1, 2, 3].map((i) => (
+                <article key={i} className="rounded-xl border border-border bg-card p-4 opacity-60">
+                  <div className="flex items-center gap-2">
+                    <HelpCircle className="h-4 w-4" aria-hidden="true" />
+                    <span className="text-sm font-medium">PYQ {i}</span>
+                  </div>
+                  <p className="mt-2 text-sm text-muted-foreground">Placeholder</p>
+                </article>
+              ))}
         </div>
       </section>
 
@@ -92,7 +102,9 @@ export default function SubjectPage({ params }: { params: { slug: string } }) {
             ? videos.map((v) => (
                 <Link
                   key={v.id}
-                  href={`/view/video?v=${encodeURIComponent(v.url)}&title=${encodeURIComponent(v.title)}`}
+                  href={`/view/video?v=${encodeURIComponent(
+                    `https://www.youtube.com/watch?v=${v.youtubeId}`,
+                  )}&title=${encodeURIComponent(v.title)}`}
                   className="rounded-xl border border-border bg-card p-4 transition-colors hover:border-foreground/30"
                 >
                   <div className="flex items-center gap-2">
@@ -106,17 +118,13 @@ export default function SubjectPage({ params }: { params: { slug: string } }) {
                 <article key={i} className="rounded-xl border border-border bg-card p-4 opacity-60">
                   <div className="flex items-center gap-2">
                     <PlayCircle className="h-4 w-4" aria-hidden="true" />
-                    <span className="text-sm font-medium">Lecture {i}</span>
+                    <span className="text-sm font-medium">Video {i}</span>
                   </div>
-                  <p className="mt-2 text-sm text-muted-foreground">YouTube • Placeholder</p>
+                  <p className="mt-2 text-sm text-muted-foreground">Placeholder</p>
                 </article>
               ))}
         </div>
       </section>
     </div>
   )
-}
-
-function slugToTitle(s: string) {
-  return s.replace(/-/g, " ").replace(/\b\w/g, (m) => m.toUpperCase())
 }
