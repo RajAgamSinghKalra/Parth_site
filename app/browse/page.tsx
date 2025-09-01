@@ -1,15 +1,12 @@
+"use client"
+
 import Link from "next/link"
-import { unstable_noStore as noStore } from "next/cache"
+import { useSearchParams } from "next/navigation"
+import useSWR from "swr"
 import { cn } from "@/lib/utils"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { prisma } from "@/lib/prisma"
 
-export const runtime = "nodejs"
-export const dynamic = "force-dynamic"
-export const revalidate = 0
-export const fetchCache = "force-no-store"
-
-type SearchParams = { by?: "college" | "course" | "subject" }
+type TabKey = "college" | "course" | "subject"
 
 const tabs = [
   { key: "college", label: "By College", href: "/browse?by=college" },
@@ -17,9 +14,11 @@ const tabs = [
   { key: "subject", label: "By Subject", href: "/browse?by=subject" },
 ] as const
 
-export default function BrowsePage({ searchParams }: { searchParams: SearchParams }) {
-  noStore()
-  const active = (searchParams.by || "college") as SearchParams["by"]
+const fetcher = (u: string) => fetch(u).then((r) => r.json())
+
+export default function BrowsePage() {
+  const searchParams = useSearchParams()
+  const active = (searchParams.get("by") as TabKey) || "college"
 
   return (
     <div className="space-y-6">
@@ -53,9 +52,17 @@ export default function BrowsePage({ searchParams }: { searchParams: SearchParam
   )
 }
 
-async function CollegeGrid() {
-  noStore()
-  const colleges = await prisma.college.findMany({ orderBy: { name: "asc" } })
+type College = { id: string; name: string; slug: string }
+type Course = { id: string; name: string; slug: string }
+type Subject = { id: string; name: string; slug: string }
+
+function CollegeGrid() {
+  const { data } = useSWR<{ items: College[] }>(
+    "/api/colleges?page=1&pageSize=1000",
+    fetcher,
+    { refreshInterval: 10000 },
+  )
+  const colleges = data?.items || []
   return (
     <section aria-labelledby="colleges" className="space-y-3">
       <h2 id="colleges" className="font-serif text-xl font-semibold">
@@ -83,9 +90,13 @@ async function CollegeGrid() {
   )
 }
 
-async function CourseGrid() {
-  noStore()
-  const courses = await prisma.course.findMany({ orderBy: { name: "asc" } })
+function CourseGrid() {
+  const { data } = useSWR<{ items: Course[] }>(
+    "/api/courses?page=1&pageSize=1000",
+    fetcher,
+    { refreshInterval: 10000 },
+  )
+  const courses = data?.items || []
   return (
     <section aria-labelledby="courses" className="space-y-3">
       <h2 id="courses" className="font-serif text-xl font-semibold">
@@ -113,9 +124,13 @@ async function CourseGrid() {
   )
 }
 
-async function SubjectGrid() {
-  noStore()
-  const subjects = await prisma.subject.findMany({ orderBy: { name: "asc" } })
+function SubjectGrid() {
+  const { data } = useSWR<{ items: Subject[] }>(
+    "/api/subjects?page=1&pageSize=1000",
+    fetcher,
+    { refreshInterval: 10000 },
+  )
+  const subjects = data?.items || []
   return (
     <section aria-labelledby="subjects" className="space-y-3">
       <h2 id="subjects" className="font-serif text-xl font-semibold">
