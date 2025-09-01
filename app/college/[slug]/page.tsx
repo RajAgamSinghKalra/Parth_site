@@ -1,12 +1,13 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { unstable_noStore as noStore } from "next/cache"
+import { noStore } from "next/cache"
 import { PageTracker } from "@/components/tracking/page-tracker"
 import { prisma } from "@/lib/prisma"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 export const revalidate = 0
+export const fetchCache = "force-no-store"
 
 export default async function CollegePage({ params }: { params: { slug: string } }) {
   noStore()

@@ -1,13 +1,14 @@
 import { FileText, HelpCircle, PlayCircle } from "lucide-react"
 import Link from "next/link" // use internal viewers
 import { notFound } from "next/navigation"
-import { unstable_noStore as noStore } from "next/cache"
+import { noStore } from "next/cache"
 import { PageTracker } from "@/components/tracking/page-tracker"
 import { prisma } from "@/lib/prisma"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 export const revalidate = 0
+export const fetchCache = "force-no-store"
 
 export default async function SubjectPage({ params }: { params: { slug: string } }) {
   noStore()
