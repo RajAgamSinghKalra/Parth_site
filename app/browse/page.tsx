@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { noStore } from "next/cache"
+import { unstable_noStore as noStore } from "next/cache"
 import { cn } from "@/lib/utils"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { prisma } from "@/lib/prisma"
