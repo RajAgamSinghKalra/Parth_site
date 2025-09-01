@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { unstable_noStore as noStore } from "next/cache"
+import { noStore } from "next/cache"
 import { cn } from "@/lib/utils"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { prisma } from "@/lib/prisma"
@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma"
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 export const revalidate = 0
+export const fetchCache = "force-no-store"
 
 type SearchParams = { by?: "college" | "course" | "subject" }
 
