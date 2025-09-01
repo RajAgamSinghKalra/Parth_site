@@ -67,7 +67,7 @@ model Material {
   description String?
   fileUrl     String?
   externalUrl String?
-  tags        String[]
+  tags        Json?      @default("[]")
   year        Int?
   author      String?
   createdAt   DateTime     @default(now())
@@ -82,7 +82,7 @@ model PYQ {
   examType     String
   fileUrl      String
   solutionsUrl String?
-  tags         String[]
+  tags         Json?     @default("[]")
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
@@ -94,7 +94,7 @@ model Video {
   youtubeId   String
   title       String
   description String?
-  tags        String[]
+  tags        Json?     @default("[]")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
