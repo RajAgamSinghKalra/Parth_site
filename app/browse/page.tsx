@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
-import useLiveQuery from "@/hooks/use-live-query"
+import useSWR from "swr"
 import { cn } from "@/lib/utils"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -54,10 +54,17 @@ type College = { id: string; name: string; slug: string }
 type Course = { id: string; name: string; slug: string }
 type Subject = { id: string; name: string; slug: string }
 
+const fetcher = (url: string) =>
+  fetch(url, { cache: "no-store" }).then((r) => {
+    if (!r.ok) throw new Error(`Failed to fetch: ${r.status}`)
+    return r.json()
+  })
+
 function CollegeGrid() {
-  const { data, error } = useLiveQuery<{ items: College[] }>(
+  const { data, error } = useSWR<{ items: College[] }>(
     "/api/colleges?page=1&pageSize=1000",
-    10000,
+    fetcher,
+    { refreshInterval: 10000 },
   )
   if (error) return <p className="text-sm text-muted-foreground">Failed to load colleges.</p>
   if (!data) return <p className="text-sm text-muted-foreground">Loading...</p>
@@ -90,9 +97,10 @@ function CollegeGrid() {
 }
 
 function CourseGrid() {
-  const { data, error } = useLiveQuery<{ items: Course[] }>(
+  const { data, error } = useSWR<{ items: Course[] }>(
     "/api/courses?page=1&pageSize=1000",
-    10000,
+    fetcher,
+    { refreshInterval: 10000 },
   )
   if (error) return <p className="text-sm text-muted-foreground">Failed to load courses.</p>
   if (!data) return <p className="text-sm text-muted-foreground">Loading...</p>
@@ -125,9 +133,10 @@ function CourseGrid() {
 }
 
 function SubjectGrid() {
-  const { data, error } = useLiveQuery<{ items: Subject[] }>(
+  const { data, error } = useSWR<{ items: Subject[] }>(
     "/api/subjects?page=1&pageSize=1000",
-    10000,
+    fetcher,
+    { refreshInterval: 10000 },
   )
   if (error) return <p className="text-sm text-muted-foreground">Failed to load subjects.</p>
   if (!data) return <p className="text-sm text-muted-foreground">Loading...</p>
