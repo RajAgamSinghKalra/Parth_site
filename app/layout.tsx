@@ -49,7 +49,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className={inter.variable + " " + sourceSerif.variable + " antialiased"}>
-      <body>
+      <body suppressHydrationWarning>
         {/* Wrap with ThemeProvider to enable next-themes across the app */}
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <ClientLayout>{children}</ClientLayout>
