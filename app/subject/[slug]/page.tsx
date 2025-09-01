@@ -1,7 +1,7 @@
 import { FileText, HelpCircle, PlayCircle } from "lucide-react"
 import Link from "next/link" // use internal viewers
 import { notFound } from "next/navigation"
-import { noStore } from "next/cache"
+import { unstable_noStore as noStore } from "next/cache"
 import { PageTracker } from "@/components/tracking/page-tracker"
 import { prisma } from "@/lib/prisma"
 

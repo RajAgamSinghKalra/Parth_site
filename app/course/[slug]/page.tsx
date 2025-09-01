@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { noStore } from "next/cache"
+import { unstable_noStore as noStore } from "next/cache"
 import { PageTracker } from "@/components/tracking/page-tracker"
 import { prisma } from "@/lib/prisma"
 
