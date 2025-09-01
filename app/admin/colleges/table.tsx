@@ -37,7 +37,15 @@ export default function CollegesClient() {
       headers: { "content-type": "application/json" },
       body: JSON.stringify(values),
     })
-    if (!res.ok) throw new Error("Create failed")
+    if (!res.ok) {
+      const data = await res.json().catch(() => null)
+      toast({
+        title: "Create failed",
+        description: data?.error || data?.message || res.statusText,
+        variant: "destructive",
+      })
+      return
+    }
     toast({ title: "Created" })
     mutate()
   }
@@ -48,14 +56,30 @@ export default function CollegesClient() {
       headers: { "content-type": "application/json" },
       body: JSON.stringify(values),
     })
-    if (!res.ok) throw new Error("Update failed")
+    if (!res.ok) {
+      const data = await res.json().catch(() => null)
+      toast({
+        title: "Update failed",
+        description: data?.error || data?.message || res.statusText,
+        variant: "destructive",
+      })
+      return
+    }
     toast({ title: "Updated" })
     mutate()
   }
 
   async function remove(id: string) {
     const res = await fetch(`/api/colleges/${id}`, { method: "DELETE" })
-    if (!res.ok) throw new Error("Delete failed")
+    if (!res.ok) {
+      const data = await res.json().catch(() => null)
+      toast({
+        title: "Delete failed",
+        description: data?.error || data?.message || res.statusText,
+        variant: "destructive",
+      })
+      return
+    }
     toast({ title: "Deleted" })
     mutate()
   }

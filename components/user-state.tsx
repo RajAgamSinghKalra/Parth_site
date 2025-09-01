@@ -69,7 +69,9 @@ export function UserStateProvider({ children }: { children: React.ReactNode }) {
 
 export function ContinueStudyingShelf() {
   const { bookmarks, recents } = useUserState()
-  const items = bookmarks.length ? bookmarks.slice(0, 6) : recents.slice(0, 6)
+  const [hydrated, setHydrated] = useState(false)
+  useEffect(() => setHydrated(true), [])
+  const items = hydrated ? (bookmarks.length ? bookmarks.slice(0, 6) : recents.slice(0, 6)) : []
 
   if (!items.length) {
     return (
